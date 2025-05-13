@@ -1,10 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body, Headers } from '@nestjs/common'
+
+// Decorators
+import { Ip } from '#/common/decorators'
 
 // Services
 import { AuthService } from './auth.service'
 
 // DTOs
-import { RequestPassportDto } from './dto/passport.dto'
+import { RequestPassportDto, ValidatePassportDto } from './dto/passport.dto'
 
 @Controller('auth')
 export class AuthController {
@@ -13,5 +16,14 @@ export class AuthController {
   @Post('passport')
   requestPassport(@Body() dto: RequestPassportDto) {
     return this.authService.requestPassport(dto)
+  }
+
+  @Post('passport/validate')
+  async validatePassport(
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+    @Body() dto: ValidatePassportDto
+  ) {
+    return this.authService.validatePassport({ ...dto, ip, userAgent })
   }
 }

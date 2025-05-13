@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import {
+  IsBoolean,
+  IsDate,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString
+} from 'class-validator'
 
 export class ProfileUserDto {
   @IsString()
@@ -20,4 +28,8 @@ export class ProfileUserDto {
   @IsNumber()
   @IsOptional()
   wallet!: number
+
+  @IsBoolean()
+  @IsOptional()
+  verified!: boolean
 }

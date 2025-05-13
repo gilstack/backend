@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { MailerService } from '@nestjs-modules/mailer'
 
 @Injectable()
@@ -15,7 +15,7 @@ export class MailService {
    * @param name - The name of the user
    * @param url - The url of the passport
    */
-  async sendPassport(to: string, name: string | null, url: string): Promise<void> {
+  async sendPassport(to: string, name: string | null, url: string): Promise<boolean> {
     try {
       this.logger.debug(`Sending passport to ${to}`)
 
@@ -31,9 +31,10 @@ export class MailService {
       })
 
       this.logger.log(`Passport sent successfully to ${to}`)
+      return true
     } catch (error) {
       this.logger.error(`Failed to send passport to ${to}`, error)
-      throw error
+      throw new BadRequestException('Failed to send mail with passport')
     }
   }
 }

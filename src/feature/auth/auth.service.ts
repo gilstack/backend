@@ -1,22 +1,41 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 
-// Services
+// Utils
+import { parseUserAgent } from '#/common/utils'
+
+// Strategies
 import { UserService } from '#/feature/user/user.service'
+import { PassportStrategy } from './strategies/passport.strategy'
 
 // DTOs
-import { RequestPassportDto } from './dto/passport.dto'
+import { RequestPassportDto, ValidatePassportDto } from './dto/passport.dto'
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly passportStrategy: PassportStrategy,
+    private readonly userService: UserService
+  ) {}
 
-  async requestPassport(dto: RequestPassportDto) {
-    // Find user by email
-    let user = await this.userService.findByEmail(dto.email)
+  /**
+   * Request a passport
+   * @param dto - The request passport DTO
+   * @returns The message and expiresAt
+   */
+  async requestPassport(dto: RequestPassportDto): Promise<{ message: string }> {
+    await this.passportStrategy.request(dto)
+    return { message: 'Passport sent successfully' }
+  }
 
-    // If user does not exist, create user
-    if (!user) {
-      user = await this.userService.create({ email: dto.email })
-    }
+  /**
+   * Validate a passport
+   * @param passportId - The passport ID
+   * @returns The passport
+   */
+  async validatePassport(dto: ValidatePassportDto) {
+    const { user } = await this.passportStrategy.validate(dto)
+    if (!user) throw new BadRequestException('Passport invalid or expired')
+
+    const { browser, deviceName, deviceOs } = parseUserAgent(dto.userAgent)
   }
 }

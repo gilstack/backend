@@ -8,10 +8,14 @@ import { PrismaService } from '#/prisma/prisma.service'
 
 // DTOs
 import { CreateUserDto } from './dto/create-user.dto'
-
+import { UpdateUserDto } from './dto/update-user.dto'
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findByEmail(email: string) {
+    return await this.prisma.user.findUnique({ where: { email } })
+  }
 
   async create(createUserDto: CreateUserDto) {
     const user = await this.findByEmail(createUserDto.email)
@@ -21,7 +25,10 @@ export class UserService {
     return await this.prisma.user.create({ data: { ...createUserDto, name } })
   }
 
-  async findByEmail(email: string) {
-    return this.prisma.user.findUnique({ where: { email } })
+  async update(updateUserDto: UpdateUserDto) {
+    return await this.prisma.user.update({
+      where: { id: updateUserDto.id },
+      data: updateUserDto
+    })
   }
 }

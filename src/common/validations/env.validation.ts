@@ -31,4 +31,4 @@ export const envSchema = z.object({
   MAIL_FROM_EMAIL: z.string().email()
 })
 
-export type AppEnvSchema = z.infer<typeof envSchema>
+export type Env = z.infer<typeof envSchema>

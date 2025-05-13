@@ -14,39 +14,44 @@ enum Roles {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  image         String?
-  wallet        Int       @default(0)
-  role          Roles     @default(GUEST)
-  emailVerified DateTime?
-  accounts      Account[]
-  sessions      Session[]
+  id         String     @id @default(cuid())
+  name       String
+  email      String     @unique
+  image      String?
+  wallet     Int        @default(0)
+  role       Roles      @default(GUEST)
+  verified   Boolean    @default(false)
+  verifiedAt DateTime?
+  sessions   Session[]
+  Passport   Passport[]
 }
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Passport {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
 
-  @@unique([provider, providerAccountId])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("passport")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
   userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String   @default("local")
+  ip           String   @default("0.0.0.0")
+  userAgent    String   @default("unknown")
+  browser      String   @default("unknown")
+  deviceOs     String   @default("unknown") @map("device_os")
+  deviceType   String   @default("unknown") @map("device_type")
+  refreshToken String?  @unique @map("refresh_token") @db.Text
+  lastActivity DateTime @default(now())
+  revokedAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
