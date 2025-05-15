@@ -15,6 +15,14 @@ export const envSchema = z.object({
   // Database
   DATABASE_URL: z.string().url(),
 
+  // Access Token
+  JWT_ACCESS_SECRET: z.string(),
+  JWT_ACCESS_EXPIRES_IN: z.string(),
+
+  // Refresh Token
+  JWT_REFRESH_SECRET: z.string(),
+  JWT_REFRESH_EXPIRES_IN: z.string(),
+
   // Throttler
   THROTTLE_LIMIT: z.coerce.number(),
   THROTTLE_TTL: z.coerce.number(),

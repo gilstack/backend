@@ -1,17 +1,17 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common'
+import { Controller, Get, NotFoundException } from '@nestjs/common'
+
+// Decorators
+import { CurrentUser } from './decorators/current-user.decorator'
 
 // Services
 import { UserService } from './user.service'
-
-// DTOs
-import { CreateUserDto } from './dto/create-user.dto'
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto)
+  @Get('me')
+  async me(@CurrentUser() user: { sub: string }) {
+    return await this.userService.getProfile(user.sub)
   }
 }

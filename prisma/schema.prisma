@@ -39,19 +39,19 @@ model Passport {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
-  provider     String   @default("local")
-  ip           String   @default("0.0.0.0")
-  userAgent    String   @default("unknown")
-  browser      String   @default("unknown")
-  deviceOs     String   @default("unknown") @map("device_os")
-  deviceType   String   @default("unknown") @map("device_type")
-  refreshToken String?  @unique @map("refresh_token") @db.Text
-  lastActivity DateTime @default(now())
-  revokedAt    DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  provider     String    @default("local")
+  ip           String    @default("0.0.0.0")
+  userAgent    String    @default("unknown")
+  browser      String    @default("unknown")
+  deviceOs     String    @default("unknown") @map("device_os")
+  deviceName   String    @default("unknown") @map("device_name")
+  refreshToken String?   @unique @map("refresh_token") @db.Text
+  lastActivity DateTime  @default(now())
+  revokedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

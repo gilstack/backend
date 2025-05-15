@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Passport, Roles, User } from '@prisma/client'
 
@@ -63,6 +63,17 @@ export class PassportStrategy {
   }
 
   /**
+   * Delete already used or expired passports
+   * @param userId - The user's ID
+   * @returns The deleted passports
+   */
+  async delete(userId: string) {
+    return await this.prisma.passport.deleteMany({
+      where: { userId, OR: [{ used: true }, { expiresAt: { lt: new Date() } }] }
+    })
+  }
+
+  /**
    * Request a passport
    * @param dto - The request passport DTO
    * @returns The message and expiresAt
@@ -81,14 +92,16 @@ export class PassportStrategy {
 
     // If the user has a valid passport
     if (validPassport) {
-      // Return the remaining time
-      return {
-        message: 'Passport already exists',
+      throw new ConflictException({
+        message: 'Passport already sent.',
         remaining: validPassport.remaining
-      }
+      })
     }
 
     try {
+      // Delete already used or expired passports
+      await this.delete(user.id)
+
       // Create passport and return it
       const passport = await this.create(user.id)
 
@@ -116,7 +129,7 @@ export class PassportStrategy {
       include: { user: true }
     })
 
-    // If not found, throw error
+    // If not found or invalid, throw error
     if (!passport || passport.used || passport.expiresAt < new Date()) {
       throw new BadRequestException('Passport invalid or expired')
     }

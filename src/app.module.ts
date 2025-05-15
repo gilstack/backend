@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
-import { ThrottlerGuard } from '@nestjs/throttler'
+import { ConfigModule } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
 
 // Utils
 import { ValidateEnv } from '#/common/utils'
@@ -13,6 +13,10 @@ import { LoggerModule } from '#/common/modules/logger.module'
 import { AuthModule } from '#/feature/auth/auth.module'
 import { UserModule } from '#/feature/user/user.module'
 
+// Guards
+import { ThrottlerGuard } from '@nestjs/throttler'
+import { JwtAuthGuard } from '#/common/guards'
+
 @Module({
   imports: [
     //Environment
@@ -21,6 +25,11 @@ import { UserModule } from '#/feature/user/user.module'
       envFilePath: `.env`,
       validate: ValidateEnv,
       cache: true
+    }),
+
+    // JWT
+    JwtModule.register({
+      global: true
     }),
 
     // Modules
@@ -34,6 +43,10 @@ import { UserModule } from '#/feature/user/user.module'
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
     }
   ]
 })

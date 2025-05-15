@@ -1,34 +1,42 @@
+import { Expose } from 'class-transformer'
 import {
   IsBoolean,
-  IsDate,
   IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsString
+  IsString,
+  IsUUID
 } from 'class-validator'
 
 export class ProfileUserDto {
-  @IsString()
+  @Expose()
+  @IsUUID()
   @IsNotEmpty()
+  @IsOptional()
   id!: string
 
+  @Expose()
   @IsString()
   @IsOptional()
   name!: string
 
+  @Expose()
   @IsEmail()
   @IsNotEmpty()
   email!: string
 
+  @Expose()
   @IsString()
   @IsOptional()
-  image!: string
+  image?: string | null
 
+  @Expose()
   @IsNumber()
   @IsOptional()
   wallet!: number
 
+  @Expose()
   @IsBoolean()
   @IsOptional()
   verified!: boolean

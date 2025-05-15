@@ -35,10 +35,10 @@ CREATE TABLE "Session" (
     "userAgent" TEXT NOT NULL DEFAULT 'unknown',
     "browser" TEXT NOT NULL DEFAULT 'unknown',
     "device_os" TEXT NOT NULL DEFAULT 'unknown',
-    "device_type" TEXT NOT NULL DEFAULT 'unknown',
+    "device_name" TEXT NOT NULL DEFAULT 'unknown',
     "refresh_token" TEXT,
     "lastActivity" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "revokedAt" TIMESTAMP(3) NOT NULL,
+    "revokedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
