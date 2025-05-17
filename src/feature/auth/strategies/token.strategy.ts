@@ -123,13 +123,15 @@ export class TokenStrategy {
         throw new BadRequestException('Invalid refresh type')
       }
 
-      // Check if session exists or revoked
-      const session = await this.sessionStrategy.getSession(payload.sessionId)
+      // Check if the session exists
+      const sessions = await this.sessionStrategy.getSessions(payload.sub)
+      const session = sessions.find((session) => session.refreshToken === dto.refreshToken)
 
-      // Check if the refresh token is valid
-      if (session.refreshToken !== dto.refreshToken) {
-        await this.sessionStrategy.revokeAll(session.userId)
-        throw new UnauthorizedException('Invalid refresh token')
+      // Check if the session is valid
+      if (!session || session.refreshToken !== dto.refreshToken || session.revokedAt) {
+        // Revoke all sessions for security
+        await this.sessionStrategy.revokeAll(payload.sub)
+        throw new UnauthorizedException('Session expired or revoked')
       }
 
       // Generate new tokens
@@ -138,7 +140,7 @@ export class TokenStrategy {
       if (error instanceof UnauthorizedException) {
         throw error
       }
-      throw new UnauthorizedException('Invalid or expired refresh token')
+      throw new UnauthorizedException('Session expired or revoked')
     }
   }
 }

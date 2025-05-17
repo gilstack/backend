@@ -44,11 +44,11 @@ export class UserService {
     })
   }
 
-  async getProfile(sub: string): Promise<ProfileUserDto> {
-    if (!sub) throw new BadRequestException('Data is missing')
+  async getProfile(userId: string): Promise<ProfileUserDto> {
+    if (!userId) throw new BadRequestException('Data is missing')
 
     const profile = await this.prisma.user.findUnique({
-      where: { id: sub },
+      where: { id: userId },
       select: {
         id: true,
         name: true,

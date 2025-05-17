@@ -67,15 +67,10 @@ export class AuthService {
       } as CreateSessionDto)
 
       // Generate the tokens
-      const { accessToken, refreshToken } = await this.tokenStrategy.generateTokens(session.id)
-
-      // Transform the user to a profile user
-      const profileUser = plainToInstance(ProfileUserDto, user, {
-        excludeExtraneousValues: true
-      })
+      const tokens = await this.tokenStrategy.generateTokens(session.id)
 
       // Return the tokens and user
-      return { ...profileUser, accessToken, refreshToken }
+      return { id: user.id, email: user.email, verified: user.verified, ...tokens }
     } catch (error) {
       throw new BadRequestException('Failed to validate passport')
     }
@@ -83,14 +78,33 @@ export class AuthService {
 
   /**
    * Refresh a session
+   * @param dto - The refresh token DTO
    * @param sessionId - The session ID
    * @returns The tokens and user profile
    */
-  async refreshSession(dto: RefreshTokenDto, sessionId: string) {
+  async refreshSession(dto: RefreshTokenDto) {
+    if (!dto.refreshToken) throw new BadRequestException('Data is missing')
+
     try {
-      return await this.tokenStrategy.generateTokens(sessionId)
+      return await this.tokenStrategy.refreshToken(dto)
     } catch (error) {
-      throw new UnauthorizedException('Invalid or expired refresh token')
+      throw new UnauthorizedException('Failed to refresh session')
+    }
+  }
+
+  /**
+   * Logout a user
+   * @param sub - The user ID
+   * @returns The message
+   */
+  async logout(userId: string) {
+    if (!userId) throw new BadRequestException('Data is missing')
+
+    try {
+      await this.sessionStrategy.revokeAll(userId)
+      return { message: 'Logged out successfully' }
+    } catch (error) {
+      throw new BadRequestException('Failed to logout')
     }
   }
 }

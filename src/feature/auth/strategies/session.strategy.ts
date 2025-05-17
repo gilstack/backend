@@ -20,7 +20,10 @@ export class SessionStrategy {
     if (!userId) throw new BadRequestException('Data is missing')
 
     try {
-      const sessions = await this.prisma.session.findMany({ where: { userId } })
+      const sessions = await this.prisma.session.findMany({
+        where: { userId, revokedAt: null }
+      })
+
       if (!sessions) throw new NotFoundException('Sessions not found')
 
       return sessions
@@ -33,7 +36,9 @@ export class SessionStrategy {
     if (!sessionId) throw new BadRequestException('Data is missing')
 
     try {
-      const session = await this.prisma.session.findUnique({ where: { id: sessionId } })
+      const session = await this.prisma.session.findUnique({
+        where: { id: sessionId }
+      })
 
       if (!session || session.revokedAt) {
         throw new UnauthorizedException('Session expired or revoked')
