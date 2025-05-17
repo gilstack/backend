@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common'
 import { Logger } from 'nestjs-pino'
+import cookieParser from 'cookie-parser'
 import { env } from 'process'
 
 import type { NestExpressApplication } from '@nestjs/platform-express'
@@ -28,6 +29,9 @@ export const bootstrap = async (app: NestExpressApplication): Promise<void> => {
 
   // Set endpoint prefix
   app.setGlobalPrefix(env.PREFIX ?? 'api')
+
+  // Set cookie parser
+  app.use(cookieParser())
 
   // Logger extended
   app.useLogger(logger)

@@ -1,0 +1,9 @@
+[90m[main 2025-05-17T14:28:31.991Z][0m updateURL https://api2.cursor.sh/updates/api/update/linux-x64/cursor/0.49.6/6862ff51c52db8031520e096264b73b86457aed41993918b57466524846666aa/stable
+[90m[main 2025-05-17T14:28:31.991Z][0m update#setState idle
+[90m[main 2025-05-17T14:28:31.992Z][0m update#ctor - manual checks only; automatic updates are disabled by user preference
+[757920:0517/112834.596729:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 1 times!
+[757920:0517/112834.600110:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 2 times!
+[757920:0517/112834.616457:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 3 times!
+[91m[main 2025-05-17T14:35:38.494Z][0m [UtilityProcess id: 2, type: fileWatcher, pid: 762142]: crashed with code 15 and reason 'killed'
+[90m[main 2025-05-17T14:35:38.530Z][0m Extension host with pid 762143 exited with code: 0, signal: unknown.
+[757796:0517/122240.359865:ERROR:atom_cache.cc(229)] Add WM_CHANGE_STATE to kAtomsToCache

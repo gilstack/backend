@@ -1,16 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
-import { Request } from 'express'
 import { ExtractJwt, Strategy } from 'passport-jwt'
+import { Request } from 'express'
 
 // Services
 import { UserService } from '#/feature/user/user.service'
-
-// Strategies
 import { SessionStrategy } from '#/feature/auth/strategies/session.strategy'
 
-// Interfaces
+// Types
 import type { RefreshPayload } from '#/common/types'
 
 @Injectable()
@@ -21,7 +19,11 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     private readonly sessionStrategy: SessionStrategy
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => {
+          return req?.cookies?.storagie_session || null
+        }
+      ]),
       secretOrKey: config.getOrThrow('JWT_REFRESH_SECRET'),
       ignoreExpiration: false,
       passReqToCallback: true
@@ -33,8 +35,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
       throw new UnauthorizedException('Invalid refresh payload')
     }
 
-    if (!req.body?.refreshToken) {
-      throw new UnauthorizedException('Refresh token is required')
+    const refreshToken = req.cookies?.storagie_session
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token cookie missing')
     }
 
     const user = await this.userService.findById(payload.sub)
@@ -42,9 +45,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
 
     const session = await this.sessionStrategy.getSession(payload.sessionId)
 
-    if (session.refreshToken !== req.body?.refreshToken) {
+    if (!session || session.refreshToken !== refreshToken) {
       await this.sessionStrategy.revokeAll(payload.sub)
-      throw new UnauthorizedException('Invalid refresh token')
+      throw new UnauthorizedException('Invalid refresh token or session revoked')
     }
 
     return {

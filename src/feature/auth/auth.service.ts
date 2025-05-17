@@ -47,13 +47,7 @@ export class AuthService {
     const { browser, deviceName, deviceOs } = parseUserAgent(dto.userAgent)
 
     try {
-      // Check if the user has any sessions
-      let sessions = await this.sessionStrategy.getSessions(user.id)
-
-      // If the user has any sessions, revoke them
-      if (sessions.length > 0) {
-        await this.sessionStrategy.revokeAll(user.id)
-      }
+      await this.sessionStrategy.revokeAll(user.id)
 
       // Create a new session
       const session = await this.sessionStrategy.create({
@@ -66,11 +60,8 @@ export class AuthService {
         deviceOs
       } as CreateSessionDto)
 
-      // Generate the tokens
-      const tokens = await this.tokenStrategy.generateTokens(session.id)
-
-      // Return the tokens and user
-      return { id: user.id, email: user.email, verified: user.verified, ...tokens }
+      // Return the tokens
+      return await this.tokenStrategy.generateTokens(session.id)
     } catch (error) {
       throw new BadRequestException('Failed to validate passport')
     }

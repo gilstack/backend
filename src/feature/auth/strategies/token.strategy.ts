@@ -125,11 +125,10 @@ export class TokenStrategy {
 
       // Check if the session exists
       const sessions = await this.sessionStrategy.getSessions(payload.sub)
-      const session = sessions.find((session) => session.refreshToken === dto.refreshToken)
+      const session = sessions.find((s) => s.refreshToken === dto.refreshToken)
 
       // Check if the session is valid
-      if (!session || session.refreshToken !== dto.refreshToken || session.revokedAt) {
-        // Revoke all sessions for security
+      if (!session || session.revokedAt) {
         await this.sessionStrategy.revokeAll(payload.sub)
         throw new UnauthorizedException('Session expired or revoked')
       }
@@ -137,9 +136,7 @@ export class TokenStrategy {
       // Generate new tokens
       return await this.generateTokens(session.id)
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw error
-      }
+      if (error instanceof UnauthorizedException) throw error
       throw new UnauthorizedException('Session expired or revoked')
     }
   }
